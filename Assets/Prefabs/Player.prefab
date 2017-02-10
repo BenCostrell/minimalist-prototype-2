@@ -89,8 +89,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerNum: 0
-  growthRate: 0.01
-  maxExpandTime: 2
+  maxExpansionSize: 2
+  maxExpandTime: 0.5
+  maxContractTime: 1
 --- !u!212 &212765581338135652
 SpriteRenderer:
   m_ObjectHideFlags: 1

@@ -6,8 +6,12 @@ public class PlayerController : MonoBehaviour {
 
 	public int playerNum;
 	private float expansionTimeRemaining;
-	public float growthRate;
+	private float contractionTimeRemaining;
+	public float maxExpansionSize;
 	public float maxExpandTime;
+	public float maxContractTime;
+	private bool expanding;
+	private bool contracting;
 	private float defaultRadius;
 	private Rigidbody2D rb;
 
@@ -23,29 +27,55 @@ public class PlayerController : MonoBehaviour {
 		if (expansionTimeRemaining > 0) {
 			Expand ();
 			expansionTimeRemaining -= Time.deltaTime;
-		} else {
-			ResetScale ();
+		} else if (expanding) {
+			BeginContraction ();
+		} else if (contractionTimeRemaining > 0) {
+			Contract ();
+			contractionTimeRemaining -= Time.deltaTime;
+		} else if (contracting) {
+			ResetToNeutral ();
 		}
 	}
 
 	void ProcessInput(){
 		if (Input.GetButtonDown("Shalom_P" + playerNum)){
-			if (expansionTimeRemaining > 0) {
-				expansionTimeRemaining = 0;
+			if (expanding || contracting) {
 				MoveToEdge ();
-				ResetScale ();
+				ResetToNeutral ();
 			} else {
-				expansionTimeRemaining = maxExpandTime;
+				BeginExpansion ();	
 			}
 		}
 	}
 
 	void Expand(){
-		transform.localScale += growthRate * Vector3.one;
+		transform.localScale = Vector3.Lerp (Vector3.one, maxExpansionSize * Vector3.one, 1 - expansionTimeRemaining / maxExpandTime);
 	}
 
-	void ResetScale(){
+	void Contract(){
+		transform.localScale = Vector3.Lerp (maxExpansionSize * Vector3.one, Vector3.one, 1 - contractionTimeRemaining / maxContractTime);
+	}
+
+	void BeginExpansion(){
+		expanding = true;
+		expansionTimeRemaining = maxExpandTime;
+		GetComponent<SpriteRenderer> ().color = Color.red;
+	}
+
+	void BeginContraction(){
+		expanding = false;
+		contracting = true;
+		contractionTimeRemaining = maxContractTime;
+		GetComponent<SpriteRenderer> ().color = Color.blue;
+	}
+
+	void ResetToNeutral(){
+		expansionTimeRemaining = 0;
+		contractionTimeRemaining = 0;
+		expanding = false;
+		contracting = false;
 		transform.localScale = Vector3.one;
+		GetComponent<SpriteRenderer> ().color = Color.white;
 	}
 
 	void MoveToEdge(){
