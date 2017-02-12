@@ -25,7 +25,7 @@ GameObject:
   - component: {fileID: 50852832427897638}
   m_Layer: 0
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -91,7 +91,10 @@ MonoBehaviour:
   playerNum: 0
   maxExpansionSize: 2
   maxExpandTime: 0.5
-  contractionTimeFactor: 2
+  contractionTimeFactor: 1.5
+  kbToStunRatio: 0.2
+  baseKnockback: 3
+  knockbackGrowth: 0.5
 --- !u!212 &212765581338135652
 SpriteRenderer:
   m_ObjectHideFlags: 1

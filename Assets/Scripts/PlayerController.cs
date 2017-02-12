@@ -14,9 +14,14 @@ public class PlayerController : MonoBehaviour {
 	private float expandedUpTo;
 	private bool expanding;
 	private bool contracting;
+	private float stunTimeRemaining;
+	public float kbToStunRatio;
 	private float defaultRadius;
 	private float targetEdge;
 	private Rigidbody2D rb;
+	private int damage;
+	public float baseKnockback;
+	public float knockbackGrowth;
 
 	// Use this for initialization
 	void Start () {
@@ -26,11 +31,18 @@ public class PlayerController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		ProcessInput ();
-		if (expanding) {
-			Expand ();
-		} else if (contracting) {
-			Contract ();
+		if (stunTimeRemaining > 0) {
+			stunTimeRemaining -= Time.deltaTime;
+			if (stunTimeRemaining <= 0) {
+				ResetToNeutral ();
+			}
+		} else {
+			ProcessInput ();
+			if (expanding) {
+				Expand ();
+			} else if (contracting) {
+				Contract ();
+			}
 		}
 	}
 
@@ -91,6 +103,7 @@ public class PlayerController : MonoBehaviour {
 		expanding = false;
 		contracting = false;
 		transform.localScale = Vector3.one;
+		rb.velocity = Vector2.zero;
 		GetComponent<SpriteRenderer> ().color = Color.white;
 	}
 
@@ -103,6 +116,25 @@ public class PlayerController : MonoBehaviour {
 			newPosition.x = targetEdge + collider.bounds.extents.x;
 		}
 		transform.position = newPosition;
+	}
+
+	void OnTriggerEnter2D(Collider2D collider){
+		if (collider.gameObject.tag == "Player") {
+			if (collider.gameObject.GetComponent<PlayerController> ().expanding) {
+				GetHit ();
+			}
+		}
+	}
+
+	void GetHit(){
+		damage += 1;
+		float knockbackMagnitude = baseKnockback + (damage * knockbackGrowth);
+		stunTimeRemaining = kbToStunRatio * knockbackMagnitude;
+		if (playerNum == 1) {
+			knockbackMagnitude *= -1;
+		}
+		rb.velocity =  knockbackMagnitude * Vector2.right;
+		GetComponent<SpriteRenderer> ().color = Color.grey;
 	}
 
 }
