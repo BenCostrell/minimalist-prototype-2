@@ -91,7 +91,7 @@ MonoBehaviour:
   playerNum: 0
   maxExpansionSize: 2
   maxExpandTime: 0.5
-  maxContractTime: 1
+  contractionTimeFactor: 2
 --- !u!212 &212765581338135652
 SpriteRenderer:
   m_ObjectHideFlags: 1
