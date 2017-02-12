@@ -64,7 +64,8 @@ public class PlayerController : MonoBehaviour {
 
 	void Expand(){
 		expansionTimeRemaining -= Time.deltaTime;
-		transform.localScale = Vector3.Lerp (Vector3.one, maxExpansionSize * Vector3.one, 1 - expansionTimeRemaining / maxExpandTime);
+		transform.localScale = Mathfx.Sinerp(Vector3.one, maxExpansionSize * Vector3.one, 1 - expansionTimeRemaining / maxExpandTime);
+		//transform.localScale = Vector3.Lerp (Vector3.one, maxExpansionSize * Vector3.one, 1 - expansionTimeRemaining / maxExpandTime);
 		expansionTimeElapsed = Mathf.Min(maxExpandTime - expansionTimeRemaining, maxExpandTime);
 		expandedUpTo = transform.localScale.x;
 		if (expansionTimeRemaining <= 0) {
@@ -74,8 +75,10 @@ public class PlayerController : MonoBehaviour {
 
 	void Contract(){
 		contractionTimeRemaining -= Time.deltaTime;
-		transform.localScale = Vector3.Lerp (expandedUpTo * Vector3.one, Vector3.one, 
+		transform.localScale = Mathfx.Coserp (expandedUpTo * Vector3.one, Vector3.one, 
 			1 - contractionTimeRemaining / (expansionTimeElapsed * contractionTimeFactor));
+		/*transform.localScale = Vector3.Lerp (expandedUpTo * Vector3.one, Vector3.one, 
+			1 - contractionTimeRemaining / (expansionTimeElapsed * contractionTimeFactor));*/
 		MoveToEdge ();
 		if (contractionTimeRemaining <= 0) {
 			ResetToNeutral ();
