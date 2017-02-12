@@ -22,26 +22,30 @@ public class PlayerController : MonoBehaviour {
 	private int damage;
 	public float baseKnockback;
 	public float knockbackGrowth;
+	private GameManager gameManager;
 
 	// Use this for initialization
 	void Start () {
 		rb = GetComponent<Rigidbody2D> ();
 		defaultRadius = GetComponent<CircleCollider2D> ().bounds.extents.x;
+		gameManager = GameObject.FindGameObjectWithTag ("GameManager").GetComponent<GameManager> ();
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		if (stunTimeRemaining > 0) {
-			stunTimeRemaining -= Time.deltaTime;
-			if (stunTimeRemaining <= 0) {
-				ResetToNeutral ();
-			}
-		} else {
-			ProcessInput ();
-			if (expanding) {
-				Expand ();
-			} else if (contracting) {
-				Contract ();
+		if (!gameManager.gameOver) {
+			if (stunTimeRemaining > 0) {
+				stunTimeRemaining -= Time.deltaTime;
+				if (stunTimeRemaining <= 0) {
+					ResetToNeutral ();
+				}
+			} else {
+				ProcessInput ();
+				if (expanding) {
+					Expand ();
+				} else if (contracting) {
+					Contract ();
+				}
 			}
 		}
 	}
@@ -123,6 +127,8 @@ public class PlayerController : MonoBehaviour {
 			if (collider.gameObject.GetComponent<PlayerController> ().expanding) {
 				GetHit ();
 			}
+		} else if (collider.gameObject.tag == "Wall") {
+			gameManager.EndGame (playerNum);
 		}
 	}
 

@@ -8,9 +8,11 @@ public class GameManager : MonoBehaviour {
 	public GameObject playerPrefab;
 	public Vector3 spawnP1;
 	public Vector3 spawnP2;
+	public bool gameOver;
 
 	// Use this for initialization
 	void Start () {
+		gameOver = false;
 		InitializePlayers ();
 	}
 	
@@ -27,5 +29,14 @@ public class GameManager : MonoBehaviour {
 
 		GameObject player2 = Instantiate (playerPrefab, spawnP2, Quaternion.identity);
 		player2.GetComponent<PlayerController> ().playerNum = 2;
+	}
+
+	public void EndGame(int playerNum){
+		if (playerNum == 2) {
+			Debug.Log ("Player 1 Wins");
+		} else {
+			Debug.Log ("Player 2 Wins");
+		}
+		gameOver = true;
 	}
 }
