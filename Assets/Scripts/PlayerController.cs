@@ -125,19 +125,27 @@ public class PlayerController : MonoBehaviour {
 	void OnTriggerEnter2D(Collider2D collider){
 		if (collider.gameObject.tag == "Player") {
 			if (collider.gameObject.GetComponent<PlayerController> ().expanding) {
-				GetHit ();
+				if (!expanding) {
+					GetHit (false);
+				} else {
+					GetHit (true);
+				}
 			}
 		} else if (collider.gameObject.tag == "Wall") {
 			gameManager.EndGame (playerNum);
+			Destroy (gameObject);
 		}
 	}
 
-	void GetHit(){
+	void GetHit(bool clash){
 		damage += 1;
 		float knockbackMagnitude = baseKnockback + (damage * knockbackGrowth);
 		stunTimeRemaining = kbToStunRatio * knockbackMagnitude;
 		if (playerNum == 1) {
 			knockbackMagnitude *= -1;
+		}
+		if (clash) {
+			knockbackMagnitude *= 0.5f;
 		}
 		rb.velocity =  knockbackMagnitude * Vector2.right;
 		GetComponent<SpriteRenderer> ().color = Color.grey;
