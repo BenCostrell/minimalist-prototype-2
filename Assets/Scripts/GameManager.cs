@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour {
 
@@ -9,10 +10,12 @@ public class GameManager : MonoBehaviour {
 	public Vector3 spawnP1;
 	public Vector3 spawnP2;
 	public bool gameOver;
+	public GameObject winScreen;
 
 	// Use this for initialization
 	void Start () {
 		gameOver = false;
+		winScreen.SetActive (false);
 		InitializePlayers ();
 	}
 	
@@ -32,11 +35,14 @@ public class GameManager : MonoBehaviour {
 	}
 
 	public void EndGame(int playerNum){
+		int winningPlayer;
 		if (playerNum == 2) {
-			Debug.Log ("Player 1 Wins");
+			winningPlayer = 1;
 		} else {
-			Debug.Log ("Player 2 Wins");
+			winningPlayer = 2;
 		}
 		gameOver = true;
+		winScreen.SetActive (true);
+		winScreen.GetComponent<Text> ().text = "PLAYER " + winningPlayer + " WINS";
 	}
 }

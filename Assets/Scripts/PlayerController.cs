@@ -23,12 +23,14 @@ public class PlayerController : MonoBehaviour {
 	public float baseKnockback;
 	public float knockbackGrowth;
 	private GameManager gameManager;
+	private bool hitActive;
 
 	// Use this for initialization
 	void Start () {
 		rb = GetComponent<Rigidbody2D> ();
 		defaultRadius = GetComponent<CircleCollider2D> ().bounds.extents.x;
 		gameManager = GameObject.FindGameObjectWithTag ("GameManager").GetComponent<GameManager> ();
+		hitActive = true;
 	}
 	
 	// Update is called once per frame
@@ -97,7 +99,6 @@ public class PlayerController : MonoBehaviour {
 		expansionTimeRemaining = 0;
 		contracting = true;
 		contractionTimeRemaining = expansionTimeElapsed * contractionTimeFactor;
-		Debug.Log (contractionTimeRemaining);
 		GetComponent<SpriteRenderer> ().color = Color.blue;
 	}
 
@@ -122,9 +123,10 @@ public class PlayerController : MonoBehaviour {
 		transform.position = newPosition;
 	}
 
-	void OnTriggerEnter2D(Collider2D collider){
-		if (collider.gameObject.tag == "Player") {
+	void OnTriggerStay2D(Collider2D collider){
+		if (collider.gameObject.tag == "Player" && hitActive) {
 			if (collider.gameObject.GetComponent<PlayerController> ().expanding) {
+				hitActive = false;
 				if (!expanding) {
 					GetHit (false);
 				} else {
@@ -134,6 +136,12 @@ public class PlayerController : MonoBehaviour {
 		} else if (collider.gameObject.tag == "Wall") {
 			gameManager.EndGame (playerNum);
 			Destroy (gameObject);
+		}
+	}
+
+	void OnTriggerExit2D(Collider2D collider){
+		if (collider.gameObject.tag == "Player") {
+			hitActive = true;
 		}
 	}
 
