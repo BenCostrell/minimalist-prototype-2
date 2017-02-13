@@ -136,7 +136,7 @@ public class PlayerController : MonoBehaviour {
 					GetHit (true);
 				}
 			}
-		} else if (collider.gameObject.tag == "Wall") {
+		} else if (collider.gameObject.tag == "Wall" && !expanding && !contracting) {
 			gameManager.EndGame (playerNum);
 			Destroy (gameObject);
 		}
