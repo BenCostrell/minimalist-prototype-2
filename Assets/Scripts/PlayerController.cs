@@ -5,25 +5,28 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour {
 
 	public int playerNum;
-	private float expansionTimeRemaining;
-	private float contractionTimeRemaining;
+
 	public float maxExpansionSize;
 	public float maxExpandTime;
 	public float contractionTimeFactor;
+	public float kbToStunRatio;
+	public float baseKnockback;
+	public float yellowZoneFactor;
+	public GameObject[] yellowZones;
+
+
+	private float defaultRadius;
+	private float targetEdge;
+	private Rigidbody2D rb;
+	private GameManager gameManager;
+	private bool hitActive;
+	private float expansionTimeRemaining;
+	private float contractionTimeRemaining;
 	private float expansionTimeElapsed;
 	private float expandedUpTo;
 	private bool expanding;
 	private bool contracting;
 	private float stunTimeRemaining;
-	public float kbToStunRatio;
-	private float defaultRadius;
-	private float targetEdge;
-	private Rigidbody2D rb;
-	private int damage;
-	public float baseKnockback;
-	public float knockbackGrowth;
-	private GameManager gameManager;
-	private bool hitActive;
 
 	// Use this for initialization
 	void Start () {
@@ -31,6 +34,7 @@ public class PlayerController : MonoBehaviour {
 		defaultRadius = GetComponent<CircleCollider2D> ().bounds.extents.x;
 		gameManager = GameObject.FindGameObjectWithTag ("GameManager").GetComponent<GameManager> ();
 		hitActive = true;
+		yellowZones = GameObject.FindGameObjectsWithTag ("YellowZone");
 	}
 	
 	// Update is called once per frame
@@ -65,7 +69,6 @@ public class PlayerController : MonoBehaviour {
 	void Expand(){
 		expansionTimeRemaining -= Time.deltaTime;
 		transform.localScale = Mathfx.Sinerp(Vector3.one, maxExpansionSize * Vector3.one, 1 - expansionTimeRemaining / maxExpandTime);
-		//transform.localScale = Vector3.Lerp (Vector3.one, maxExpansionSize * Vector3.one, 1 - expansionTimeRemaining / maxExpandTime);
 		expansionTimeElapsed = Mathf.Min(maxExpandTime - expansionTimeRemaining, maxExpandTime);
 		expandedUpTo = transform.localScale.x;
 		if (expansionTimeRemaining <= 0) {
@@ -77,8 +80,6 @@ public class PlayerController : MonoBehaviour {
 		contractionTimeRemaining -= Time.deltaTime;
 		transform.localScale = Mathfx.Coserp (expandedUpTo * Vector3.one, Vector3.one, 
 			1 - contractionTimeRemaining / (expansionTimeElapsed * contractionTimeFactor));
-		/*transform.localScale = Vector3.Lerp (expandedUpTo * Vector3.one, Vector3.one, 
-			1 - contractionTimeRemaining / (expansionTimeElapsed * contractionTimeFactor));*/
 		MoveToEdge ();
 		if (contractionTimeRemaining <= 0) {
 			ResetToNeutral ();
@@ -128,12 +129,15 @@ public class PlayerController : MonoBehaviour {
 
 	void OnTriggerStay2D(Collider2D collider){
 		if (collider.gameObject.tag == "Player" && hitActive) {
-			if (collider.gameObject.GetComponent<PlayerController> ().expanding) {
+			bool yellowZone = false;
+			PlayerController pc = collider.gameObject.GetComponent<PlayerController> ();
+			yellowZone = pc.InYellowZone ();
+			if (pc.expanding) {
 				hitActive = false;
 				if (!expanding) {
-					GetHit (false);
+					GetHit (false, yellowZone);
 				} else {
-					GetHit (true);
+					GetHit (true, yellowZone);
 				}
 			}
 		} else if (collider.gameObject.tag == "Wall" && !expanding && !contracting) {
@@ -148,15 +152,26 @@ public class PlayerController : MonoBehaviour {
 		}
 	}
 
-	void GetHit(bool clash){
-		damage += 1;
-		float knockbackMagnitude = baseKnockback + (damage * knockbackGrowth);
+	public bool InYellowZone(){
+		foreach (GameObject zone in yellowZones) {
+			if (zone.GetComponent<BoxCollider2D> ().bounds.Contains (transform.position)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	void GetHit(bool clash, bool yellowZone){
+		float knockbackMagnitude = baseKnockback;
 		stunTimeRemaining = kbToStunRatio * knockbackMagnitude;
 		if (playerNum == 1) {
 			knockbackMagnitude *= -1;
 		}
 		if (clash) {
 			knockbackMagnitude *= 0.5f;
+		}
+		if (yellowZone) {
+			knockbackMagnitude *= yellowZoneFactor;
 		}
 		rb.velocity =  knockbackMagnitude * Vector2.right;
 		GetComponent<SpriteRenderer> ().color = Color.grey;

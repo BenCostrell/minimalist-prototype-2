@@ -92,9 +92,10 @@ MonoBehaviour:
   maxExpansionSize: 2
   maxExpandTime: 0.3
   contractionTimeFactor: 1.5
-  kbToStunRatio: 0.05
-  baseKnockback: 6
-  knockbackGrowth: 1
+  kbToStunRatio: 0.03
+  baseKnockback: 9
+  yellowZoneFactor: 1.5
+  yellowZones: []
 --- !u!212 &212765581338135652
 SpriteRenderer:
   m_ObjectHideFlags: 1
