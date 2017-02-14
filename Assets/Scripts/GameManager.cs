@@ -24,6 +24,9 @@ public class GameManager : MonoBehaviour {
 		if (Input.GetButtonDown("Reset")){
 			SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
 		}
+		if (Input.GetButtonDown("ToggleFullscreen")){
+			Screen.fullScreen = !Screen.fullScreen;
+		}
 	}
 
 	void InitializePlayers(){
