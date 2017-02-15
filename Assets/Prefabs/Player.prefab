@@ -91,7 +91,7 @@ MonoBehaviour:
   playerNum: 0
   maxExpansionSize: 2
   maxExpandTime: 0.3
-  contractionTimeFactor: 1.5
+  contractionTimeFactor: 1.75
   kbToStunRatio: 0.03
   baseKnockback: 9
   yellowZoneFactor: 1.5
